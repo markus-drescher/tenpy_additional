@@ -49,7 +49,7 @@ def myApply_local_op(mps, i, op, unitary=None, renormalize=False, truncate=False
         chi_list: list of integers; if None and truncate == True, chi_list is set to mps.chi
         """
         if mps.bc != 'infinite':
-            raise ValueError('Not implemented: Please apply_local_op of the class MPS.')
+            raise ValueError('Not implemented: Please use apply_local_op of the class MPS.')
 
         if truncate and chi_list == None:
             chi_list = mps.chi.copy()
