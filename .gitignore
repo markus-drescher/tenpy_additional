@@ -1,0 +1,8 @@
+*.swp
+./*.py
+*.dat
+*.hdf5
+.DS_Store
+!version.py
+._*
+*.pyc
