@@ -29,7 +29,7 @@ class params_time_evolution:
         assert('dt' in self.params)
         assert('t_steps_max' in self.params)
 
-        if self.algorithm == 'mpoII':
+        if self.algorithm == 'mpoII' or self.algorithm == 'mpoI':
             assert('mode' in self.params)
             assert('dt_complex' in self.params)
 
