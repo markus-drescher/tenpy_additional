@@ -5,7 +5,6 @@ import numpy as np
 
 from tenpy.networks.site import SpinSite
 from tenpy.models.model import CouplingMPOModel
-from tenpy.tools.params import asConfig
 
 
 class heisenberg_triangular(CouplingMPOModel):
