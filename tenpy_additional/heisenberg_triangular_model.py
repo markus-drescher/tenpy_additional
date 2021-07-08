@@ -37,13 +37,19 @@ class heisenberg_triangular(CouplingMPOModel):
         J2xy = model_params.get('J2xy', 0.125)
         J2z = model_params.get('J2z', 0.125)
 
+        print('*'*80)
+        print('Nearest neighbour pairs')
         for u1, u2, dx in self.lat.pairs['nearest_neighbors']:
             self.add_coupling(2*J1xy, u1, 'Sp', u2, 'Sm', dx, plus_hc=True)
             self.add_coupling(4*J1z, u1, 'Sz', u2, 'Sz', dx, plus_hc=False)
+            print('u1, u2, dx', u1, u2, dx)
 
+        print('*'*80)
+        print('Next-nearest neighbour pairs')
         for u1, u2, dx in self.lat.pairs['next_nearest_neighbors']:
             self.add_coupling(2*J2xy, u1, 'Sp', u2, 'Sm', dx, plus_hc=True)
             self.add_coupling(4*J2z, u1, 'Sz', u2, 'Sz', dx, plus_hc=False)
+            print('u1, u2, dx', u1, u2, dx)
 
 
 
