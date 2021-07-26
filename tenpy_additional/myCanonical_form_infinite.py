@@ -136,7 +136,10 @@ def myCanonical_form_infinite(mps, renormalize=True, chi_list=None, tol_xi=1.e6)
         if not renormalize:
             mps.norm *= np.sqrt(norm)
         # make Gr diagonal to Wr
-        Wr, Gl = mps._canonical_form_correct_right(i1, Gr, return_Gl_guess=True)
+        Wr, Kl, Kr = mps._canonical_form_correct_right(i1, Gr)
+        # guess for Gl
+        Gl = npc.tensordot(Kr.scale_axis(mps.get_SL(i1)**2, 1), Kl, axes=['vR', 'vL'])
+        Gl.iset_leg_labels(['vR*', 'vR'])
         # find dominant left eigenvector
         norm, Gl = mps._canonical_form_dominant_gram_matrix(i1, True, tol_xi, Gl)
         # norm = dominant left eigenvalue, Gl = dominant left eigenvector

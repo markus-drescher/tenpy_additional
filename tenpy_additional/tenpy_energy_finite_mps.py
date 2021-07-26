@@ -3,13 +3,13 @@
 import numpy as np
 # import pylab as pl
 # import matplotlib.pyplot as plt
-from tenpy.version import version_summary
+# from tenpy.version import version_summary
 from tenpy.networks.mps import MPS, MPSEnvironment
 from tenpy.networks.mpo import MPOEnvironment
 from tenpy.models.spins_nnn import SpinChainNNN2
-from tenpy.models.model import NearestNeighborModel
-from tenpy.algorithms import dmrg
-from tenpy.algorithms import tebd
+# from tenpy.models.model import NearestNeighborModel
+# from tenpy.algorithms import dmrg
+# from tenpy.algorithms import tebd
 from tenpy.linalg import np_conserved as npc
 from tenpy.tools import hdf5_io
 import time
@@ -45,7 +45,6 @@ def chi_list(chi_min, chi_max, dchi=20, nsweeps=10):
     return chi_list
 
 
-
 def energy_finite_MPS(psi, M):
     """ Computes the energy of an MPS for a model M by contracting the full finite network.
 
@@ -65,6 +64,44 @@ def get_norm(psi):
     norm = env.full_contraction(i0=psi.L//2)
     assert(np.imag(norm) < 1e-10)
     return np.sqrt(np.real(norm))
+
+
+def contract_states(psi1, psi2):
+    """ Returns <psi2 | psi1> """
+
+    assert(psi1.bc == 'finite')
+    assert(psi1.get_SR(-1) == 1)
+
+    b1 = psi1.get_B(0)
+    b2p = psi2.get_B(0).conj()
+    lleg = b1.get_leg('vL')
+    lleg_ = b2p.get_leg('vL*')
+
+    vl = np.array([[psi1.get_SL(0)[0]*psi2.get_SL(0)[0]]])
+    # vl = npc.Array.from_ndarray_trivial(vl)
+    vl = npc.Array.from_ndarray(vl, [lleg, lleg_], labels=['vR', 'vR*'])
+    # vl.iset_leg_labels(['vR', 'vR*'])
+    print('vl', vl.to_ndarray())
+    
+
+    v_l = vl
+    for i in range(psi1.L):
+        B_ket = psi1.get_B(i)
+        B_bra = psi2.get_B(i).conj()
+        v_l = npc.tensordot(
+                npc.tensordot(
+                    v_l,
+                    B_ket,
+                    axes = ['vR', 'vL']
+                ),
+                B_bra,
+                axes = (['vR*', 'p' ], ['vL*', 'p*'])
+            )
+        # axes: vR*, vR
+
+    res = npc.trace(v_l)
+
+    return res
 
 
 def print_B_new(B_new):
