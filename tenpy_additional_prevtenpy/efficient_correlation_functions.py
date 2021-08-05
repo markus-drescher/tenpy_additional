@@ -5,7 +5,6 @@
 import numpy as np
 from mps.mps import iMPS
 
-
 def corr_tx_array(psi, phi0, op, site_start, site_final):
     """ psi -- time evolved state (the ket state)
         phi0 -- ground state (the bra state)
