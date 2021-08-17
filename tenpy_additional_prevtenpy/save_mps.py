@@ -5,10 +5,11 @@
 import os
 import pickle
 import numpy as np
-import bz2
+import bz2, glob
 
 from mps.mps import iMPS
 from models.model import create_translate_Q1
+
 
 def save_mps(psi, path):
     """ Saves instance of class iMPS to several files, organized in      
@@ -65,8 +66,6 @@ def save_mps(psi, path):
         with open(subpath, 'wb') as f:
             pickle.dump(b, f)
 
-    
-
 
 def load_mps(path):
     """ Load mps """
@@ -121,7 +120,115 @@ def load_mps(path):
     obj.check_sanity()
     return obj
 
-    
+
+def save_LP(LP, path):
+    """ Save LP """
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    for i, lp in enumerate(LP):
+        subpath = os.path.join(path, 'LP_no{}.pkl'.format(i))
+        with open(subpath, 'wb') as f:
+            pickle.dump(lp, f)
+
+
+def save_RP(RP, path):
+    """ Save RP """
+    if not os.path.exists(path):
+        os.mkdir(path)
+        
+    for i, rp in enumerate(RP):
+        subpath = os.path.join(path, 'RP_no{}.pkl'.format(i))
+        with open(subpath, 'wb') as f:
+            pickle.dump(rp, f)
+
+
+def load_LP(path):
+    """ Load LP """
+    # Find number of files
+    subpath = os.path.join(path, 'LP_no*.pkl')
+    files = sorted(glob.glob(subpath), key=os.path.getmtime)
+    L = len(files)
+    LP = []
+    for i in np.arange(L):
+        subpath = os.path.join(path, 'LP_no{}.pkl'.format(i))
+        with open(subpath, 'rb') as f:
+            LP.append(pickle.load(f))
+    return LP
+        
+
+def load_RP(path):
+    """ Load RP """
+    # Find number of files
+    subpath = os.path.join(path, 'RP_no*.pkl')
+    files = sorted(glob.glob(subpath), key=os.path.getmtime)
+    L = len(files)
+    RP = []
+    for i in np.arange(L):
+        subpath = os.path.join(path, 'RP_no{}.pkl'.format(i))
+        with open(subpath, 'rb') as f:
+            RP.append(pickle.load(f))
+    return RP
+
 
     
+def save_env(env, path):
+    """ Saves instance of class environment1 to several files, organized in folders.
+    
+    It turned out that from a certain file size on (> 4 GB), saving the whole environment in one pickled bz2-file always throws an IOError (17.08.2021).
 
+    In python3, this can be resolved by using pickle with a higher protocol.
+
+    env -- instance of class environment1
+    path -- path where to store it
+    """
+
+    # Make sure the path exists
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    # psi
+    subpath = os.path.join(path, 'psi')
+    save_mps(env.ket, subpath)
+
+    # LP
+    subpath = os.path.join(path, 'LP')
+    save_LP(env.LP, subpath)
+
+    # RP
+    subpath = os.path.join(path, 'RP')
+    save_RP(env.RP, subpath)
+
+    # W
+    subpath = os.path.join(path, 'mpo.pkl')
+    with open(subpath, 'wb') as f:
+        pickle.dump(env.W, f)
+
+
+def load_env(path):
+    """ Load env """
+    
+    # psi
+    subpath = os.path.join(path, 'psi')
+    psi = load_mps(subpath)
+
+    # LP
+    subpath = os.path.join(path, 'LP')
+    LP = load_LP(subpath)
+
+    # RP
+    subpath = os.path.join(path, 'RP')
+    RP = load_RP(subpath)
+
+    # W
+    subpath = os.path.join(path, 'mpo.pkl')
+    with open(subpath, 'rb') as f:
+        W = pickle.load(f)
+
+    from mps.enviro import make_env1_from_LPRP
+    env = make_env1_from_LPRP(LP, RP, W, psi, override_labels=True)
+
+    return env
+
+
+    
