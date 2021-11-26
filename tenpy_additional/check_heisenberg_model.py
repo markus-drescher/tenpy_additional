@@ -3,6 +3,7 @@ import numpy as np
 from tenpy_additional.heisenberg_triangular_model import heisenberg_triangular
 from tenpy_additional.heisenberg_triangular_model import heisenberg_triangular_NN
 
+from functions_heisenberg.check_and_print_model import print_mpo_matrix
 
 L = 6
 Lx = 2
@@ -34,3 +35,10 @@ model_params2 = dict(Lx=Lx, Ly=L,
 
 M2 = heisenberg_triangular_NN(model_params2)
 print(M2.H_MPO.chi)
+
+print('site 0')
+print_mpo_matrix(M2.H_MPO.get_W(0).to_ndarray())
+print('\nsite 1')
+print_mpo_matrix(M2.H_MPO.get_W(1).to_ndarray())
+print('\nsite 2')
+print_mpo_matrix(M2.H_MPO.get_W(2).to_ndarray())
