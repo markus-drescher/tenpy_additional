@@ -133,5 +133,3 @@ class heisenberg_triangular_NN(CouplingMPOModel):
             self.add_coupling(2*J1xy, u1, 'Sp', u2, 'Sm', dx, plus_hc=True)
             self.add_coupling(4*J1z, u1, 'Sz', u2, 'Sz', dx, plus_hc=False)
             print('u1, u2, dx', u1, u2, dx)
-
-
